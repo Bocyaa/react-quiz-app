@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 
 const QuizContext = createContext();
 
@@ -77,6 +77,13 @@ function QuizProvider({ children }) {
     dispatch,
   ] = useReducer(reducer, initialState);
 
+  // numQuestions
+  const numQuestions = questions.length;
+  const maxPossiblePoints = questions.reduce(
+    (prev, cur) => prev + cur.points,
+    0
+  );
+
   // Effect
   useEffect(function () {
     async function fetchQuestions() {
@@ -91,6 +98,13 @@ function QuizProvider({ children }) {
     fetchQuestions();
   }, []);
 
+  // useEffect(function () {
+  //   fetch('http://localhost:8000/questions')
+  //     .then((res) => res.json())
+  //     .then((data) => dispatch({ type: 'dataReceived', payload: data }))
+  //     .catch(() => dispatch({ type: 'dataFailed' }));
+  // }, []);
+
   // Functions
 
   return (
@@ -104,6 +118,9 @@ function QuizProvider({ children }) {
         points,
         highscore,
         secondsRemaining,
+        numQuestions,
+        maxPossiblePoints,
+
         // Functions ...
         dispatch,
       }}
@@ -114,7 +131,7 @@ function QuizProvider({ children }) {
 }
 
 function useQuiz() {
-  const context = createContext(QuizContext);
+  const context = useContext(QuizContext);
   if (context === undefined)
     throw new Error('QuizContext was used outside of the QuizProvider!');
   return context;
